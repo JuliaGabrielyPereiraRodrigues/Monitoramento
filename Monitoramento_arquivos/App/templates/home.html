@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Arquivos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .loading {
+            text-align: center;
+            font-style: italic;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">🗂️ Gerenciador de Arquivos</div>
+
+    <div class="container" id="file-list">
+        <p class="loading">Carregando arquivos...</p>
+    </div>
+
+    <script>
+        function fetchFiles() {
+            console.log("🔄 Buscando arquivos..."); // Debug no console
+
+            fetch('/get-files/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("✅ Arquivos recebidos:", data); // Debug no console
+                    updateFileList(data);
+                })
+                .catch(error => {
+                    console.error("❌ Erro ao buscar arquivos:", error);
+                    document.getElementById('file-list').innerHTML = '<p class="loading">Erro ao carregar arquivos.</p>';
+                });
+        }
+
+        function updateFileList(files) {
+            console.log("📂 Atualizando lista de arquivos...");
+            const fileListContainer = document.getElementById('file-list');
+            fileListContainer.innerHTML = '';
+
+            if (files.length === 0) {
+                fileListContainer.innerHTML = '<p class="loading">Nenhum arquivo encontrado.</p>';
+            } else {
+                files.forEach(file => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.innerHTML = `
+                        <span class="file-name">${file.name}</span>
+                        <span class="file-date">📅 Atualizado em: ${new Date(file.updated_at).toLocaleString()}</span>
+                    `;
+                    fileListContainer.appendChild(fileItem);
+                });
+            }
+        }
+
+        setInterval(fetchFiles, 5000); 
+        fetchFiles(); 
+    </script>
+
+</body>
+</html>
